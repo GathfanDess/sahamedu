@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi Lengkap - SahamPedia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="bg-glow blur-1"></div>
+    <div class="bg-glow blur-2"></div>
+
+    <nav class="navbar glass-panel">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-layer-group accent-color"></i>
+                Saham<span class="accent-color">Pedia</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="materi.html" class="text-bullish">Materi</a></li>
+                <li><a href="index.html#simulation">Simulasi Live</a></li>
+            </ul>
+            <a href="#" onclick="openPricingModal(); return false;" class="btn btn-primary">Mulai Belajar</a>
+        </div>
+    </nav>
+
+    <section class="learn-section container" style="padding-top: 150px;">
+        <div class="section-header text-center">
+            <h1 class="hero-title" style="font-size: 3rem;">Pusat <span class="text-gradient">Pembelajaran</span></h1>
+            <p class="section-subtitle" style="margin: 0 auto; max-width: 600px;">
+                Dari pemula hingga mahir. Pelajari semua yang Anda butuhkan untuk sukses di pasar modal.
+            </p>
+        </div>
+
+        <h2 style="margin-bottom: 24px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
+            <i class="fa-solid fa-seedling text-bullish"></i> Level 1: Fundamental Dasar (Gratis)
+        </h2>
+        <div class="grid-cards" style="margin-bottom: 60px;">
+            <div class="feature-card glass-panel hover-glow">
+                <div class="icon-wrap bg-blue-glow"><i class="fa-solid fa-book-open"></i></div>
+                <h3>1. Apa itu Saham?</h3>
+                <p>Pemahaman dasar mengenai kepemilikan saham, cara kerja bursa efek, dan perbedaan saham dengan
+                    instrumen investasi lainnya.</p>
+                <a href="#" class="text-bullish" style="display: inline-block; margin-top: 16px; font-weight: 600;">Baca
+                    Materi <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="feature-card glass-panel hover-glow">
+                <div class="icon-wrap bg-green-glow"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                <h3>2. Sumber Keuntungan</h3>
+                <p>Memahami perbedaan Capital Gain dan Dividen, serta cara menghitung potensi keuntungan investasi Anda
+                    di masa depan.</p>
+                <a href="#" class="text-bullish" style="display: inline-block; margin-top: 16px; font-weight: 600;">Baca
+                    Materi <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <h2 style="margin-bottom: 24px; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px;">
+            <i class="fa-solid fa-crown text-warning"></i> Level 2: Analisis Lanjutan (Premium)
+        </h2>
+        <div class="grid-cards">
+            <div class="feature-card glass-panel locked-card" onclick="openPricingModal()">
+                <div class="locked-overlay">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Materi Premium</span>
+                    <button class="unlock-btn">Buka Akses</button>
+                </div>
+                <div class="icon-wrap" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3>3. Analisis Teknikal</h3>
+                <p>Membaca pola candlestick, support & resistance, serta indikator MACD dan RSI untuk menentukan momen
+                    beli yang tepat.</p>
+            </div>
+
+            <div class="feature-card glass-panel locked-card" onclick="openPricingModal()">
+                <div class="locked-overlay">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Materi Premium</span>
+                    <button class="unlock-btn">Buka Akses</button>
+                </div>
+                <div class="icon-wrap" style="background: rgba(255,255,255,0.1);"><i
+                        class="fa-solid fa-magnifying-glass-chart"></i></div>
+                <h3>4. Valuasi Perusahaan</h3>
+                <p>Cara menghitung harga wajar sebuah saham menggunakan metode PER (Price to Earning Ratio) dan PBV
+                    (Price to Book Value).</p>
+            </div>
+
+            <div class="feature-card glass-panel locked-card" onclick="openPricingModal()">
+                <div class="locked-overlay">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Materi Premium</span>
+                    <button class="unlock-btn">Buka Akses</button>
+                </div>
+                <div class="icon-wrap" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-brain"></i>
+                </div>
+                <h3>5. Psikologi Trading</h3>
+                <p>Mengendalikan emosi (Fear & Greed) di pasar saham, membuat trading plan, dan menerapkan manajemen
+                    portofolio.</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="pricingModal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <button class="close-modal" onclick="closePricingModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center" style="margin-bottom: 40px;">
+                <h2 class="section-title">Akses Semua <span class="text-gradient">Materi Premium</span></h2>
+                <p class="section-subtitle">Tingkatkan kemampuan analisis Anda dan jadilah investor mandiri.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card glass-panel">
+                    <h3>1 Bulan</h3>
+                    <div class="price">Rp 99k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-xmark text-muted"></i> Grup Komunitas VIP</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+
+                <div class="pricing-card glass-panel popular">
+                    <div class="popular-badge">Terpopuler</div>
+                    <h3>6 Bulan</h3>
+                    <div class="price">Rp 79k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Grup Komunitas VIP</li>
+                    </ul>
+                    <button class="btn btn-primary btn-glow" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+
+                <div class="pricing-card glass-panel">
+                    <h3>12 Bulan</h3>
+                    <div class="price">Rp 59k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Grup Komunitas VIP</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Mentoring 1-on-1</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer glass-panel" style="margin-top: 100px;">
+        <div class="container text-center">
+            <p>&copy; 2026 SahamPedia. Dibuat untuk tujuan edukasi investasi.</p>
+        </div>
+    </footer>
+
+    <script>
+        function openPricingModal() {
+            document.getElementById('pricingModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closePricingModal() {
+            document.getElementById('pricingModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        window.addEventListener('click', function (event) {
+            const modal = document.getElementById('pricingModal');
+            if (event.target === modal) closePricingModal();
+        });
+
+        // Efek Navbar saat Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(10, 14, 23, 0.85)';
+                nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+                nav.style.border = '1px solid rgba(255,255,255,0.1)';
+            } else {
+                nav.style.background = 'var(--glass-bg)';
+                nav.style.boxShadow = 'var(--glass-shadow)';
+                nav.style.border = '1px solid var(--glass-border)';
+            }
+        });
+    </script>
+</body>
+
+</html>

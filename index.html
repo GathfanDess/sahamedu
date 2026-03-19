@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SahamPedia - Investasi Masa Depan</title>
+    <meta name="description" content="Platform edukasi saham interaktif premium untuk pemula.">
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="bg-glow blur-1"></div>
+    <div class="bg-glow blur-2"></div>
+
+    <nav class="navbar glass-panel">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-layer-group accent-color"></i>
+                Saham<span class="accent-color">Pedia</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#hero">Beranda</a></li>
+                <li><a href="materi.html">Materi</a></li>
+                <li><a href="#simulation">Simulasi Live</a></li>
+            </ul>
+            <a href="#" onclick="openPricingModal(); return false;" class="btn btn-primary">Mulai Belajar</a>
+        </div>
+    </nav>
+    <header id="hero" class="hero-section">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="badge glass-panel">
+                    <span class="pulse-dot"></span> Pasar Buka - IHSG Hijau
+                </div>
+                <h1 class="hero-title">
+                    Kuasai Pasar Saham,<br>
+                    <span class="text-gradient">Raih Kebebasan Finansial.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Belajar saham tidak pernah semudah ini. Visualisasi data interaktif, materi ringkas untuk pemula,
+                    dan simulasi pergerakan harga saham secara langsung.
+                </p>
+                <div class="hero-actions">
+                    <a href="materi.html" class="btn btn-primary btn-glow">
+                        Eksplorasi Materi <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <a href="pasar.html" class="stats glass-panel hover-glow"
+                        style="display: block; text-decoration: none; cursor: pointer;">
+                        <div class="stat-item">
+                            <span class="stat-value text-bullish" id="ihsgValue">Memuat...</span>
+                            <span class="stat-label">IHSG Hari Ini <i class="fa-solid fa-arrow-up-right-from-square"
+                                    style="font-size: 0.8em; margin-left: 4px;"></i></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="crypto-card glass-panel floating-animation">
+                    <div class="card-header">
+                        <div class="stock-info">
+                            <div class="stock-icon"><i class="fa-solid fa-building-columns"></i></div>
+                            <div>
+                                <h3 id="heroStockCode">BBCA</h3>
+                                <span id="heroStockName">Bank Central Asia Tbk</span>
+                            </div>
+                        </div>
+                        <div class="stock-price text-bullish" id="heroPrice">
+                            Rp 10.250 <i class="fa-solid fa-arrow-trend-up"></i>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 130px; width: 100%;">
+                        <canvas id="miniChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="crypto-card-small glass-panel floating-animation offset-anim">
+                    <div class="stock-info">
+                        <i class="fa-solid fa-bolt text-warning" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h4>Volatilitas Hari Ini</h4>
+                            <span class="text-bearish">-2.4% Terkoreksi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id="learn" class="learn-section container">
+        <div class="section-header text-center">
+            <h2 class="section-title">Fundamental <span class="text-gradient">Pemula</span></h2>
+            <p class="section-subtitle">Pahami konsep dasar sebelum mulai berinvestasi. Investasi terbaik adalah leher
+                ke atas.</p>
+        </div>
+
+        <div class="grid-cards">
+            <div class="feature-card glass-panel hover-glow">
+                <div class="icon-wrap bg-blue-glow">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <h3>1. Apa itu Saham?</h3>
+                <p>Saham adalah surat bukti kepemilikan sebuah perusahaan. Membeli saham berarti Anda secara resmi
+                    menjadi salah satu pemilik (persero) di perusahaan tersebut dengan persentase tertentu.</p>
+            </div>
+
+            <div class="feature-card glass-panel hover-glow">
+                <div class="icon-wrap bg-green-glow">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                <h3>2. Sumber Keuntungan</h3>
+                <p>Investor mencari dua hal: <strong>Capital Gain</strong> (keuntungan dari naiknya harga saham di
+                    pasar) dan <strong>Dividen</strong> (pembagian kelebihan laba tunai oleh perusahaan kepada pemegang
+                    saham).</p>
+            </div>
+
+            <div class="feature-card glass-panel hover-glow">
+                <div class="icon-wrap bg-red-glow">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3>3. Manajemen Risiko</h3>
+                <p>Harga saham sangat fluktuatif mengikuti ekspektasi ekonomi. Risiko <strong>Capital Loss</strong>
+                    (kerugian penurunan harga) dapat diminimalisir dengan tidak menaruh seluruh dana dalam satu saham
+                    saja (diversifikasi).</p>
+            </div>
+        </div>
+    </section>
+    <section id="simulation" class="simulation-section">
+        <div class="container">
+            <div class="section-header text-center" style="margin-bottom: 40px;">
+                <h2 class="section-title">Ayo Coba <span class="text-gradient">Simulasi Live</span></h2>
+                <p class="section-subtitle">Lihat dan rasakan bagaimana harga saham emiten pilihan bergerak secara
+                    real-time berdasarkan simulasi pergerakan.</p>
+            </div>
+
+            <div class="dashboard grid-dashboard">
+                <div class="main-chart-area glass-panel">
+                    <div class="chart-header">
+                        <div>
+                            <h3 id="currentStockName" style="font-weight: 500;">KODE Perusahaan</h3>
+                            <div class="price-display">
+                                <span id="currentPrice" class="main-price">Rp 5.000</span>
+                                <span id="priceChange" class="change-badge bullish">+5.2%</span>
+                            </div>
+                        </div>
+                        <div class="time-filters">
+                            <button id="btn-1d" class="filter-btn active"
+                                onclick="changeTimeRange('1d', '15m', 'btn-1d')">1 Hari</button>
+                            <button id="btn-1mo" class="filter-btn" onclick="changeTimeRange('1mo', '1d', 'btn-1mo')">1
+                                Bulan</button>
+                            <button id="btn-1y" class="filter-btn" onclick="changeTimeRange('1y', '1wk', 'btn-1y')">1
+                                Tahun</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="market-list glass-panel">
+                    <h3>Simulasi Emiten</h3>
+                    <div class="stock-list" id="stockList">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="pricingModal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <button class="close-modal" onclick="closePricingModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center" style="margin-bottom: 40px;">
+                <h2 class="section-title">Pilih Paket <span class="text-gradient">Belajar</span></h2>
+                <p class="section-subtitle">Investasi terbaik untuk masa depan finansial Anda.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card glass-panel">
+                    <h3>1 Bulan</h3>
+                    <div class="price">Rp 99k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-xmark text-muted"></i> Grup Komunitas VIP</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+
+                <div class="pricing-card glass-panel popular">
+                    <div class="popular-badge">Terpopuler</div>
+                    <h3>6 Bulan</h3>
+                    <div class="price">Rp 79k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Grup Komunitas VIP</li>
+                    </ul>
+                    <button class="btn btn-primary btn-glow" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+
+                <div class="pricing-card glass-panel">
+                    <h3>12 Bulan</h3>
+                    <div class="price">Rp 59k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Grup Komunitas VIP</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Mentoring 1-on-1</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer glass-panel">
+        <div class="container text-center">
+            <p>&copy; 2026 SahamPedia. Dibuat untuk tujuan edukasi investasi.</p>
+            <p class="disclaimer">Perdagangan instrumen finansial memiliki risiko tinggi. Informasi di platform ini
+                disajikan hanya sebagai media simulasi pendidikan.</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>

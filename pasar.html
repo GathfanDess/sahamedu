@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Market BEI - SahamPedia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="bg-glow blur-1"></div>
+    <div class="bg-glow blur-2"></div>
+
+    <nav class="navbar glass-panel">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-layer-group accent-color"></i>
+                Saham<span class="accent-color">Pedia</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="materi.html">Materi</a></li>
+                <li><a href="pasar.html" class="text-bullish">Pasar Live</a></li>
+            </ul>
+            <a href="#" onclick="openPricingModal(); return false;" class="btn btn-primary">Mulai Belajar</a>
+        </div>
+    </nav>
+
+    <section class="container" style="padding-top: 130px; min-height: 100vh;">
+        <div class="section-header text-center" style="margin-bottom: 40px;">
+            <div class="badge glass-panel" style="margin-bottom: 20px;">
+                <span class="pulse-dot"></span> Pasar Buka
+            </div>
+            <h1 class="hero-title" style="font-size: 3rem;">Live <span class="text-gradient">Market</span> BEI</h1>
+
+            <div class="glass-panel hover-glow"
+                style="display: inline-block; padding: 30px 60px; border-radius: 20px; margin-top: 20px;">
+                <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 5px;">Indeks Harga Saham Gabungan
+                    (IHSG)</p>
+                <h2 id="ihsgValue" class="text-bullish" style="font-size: 4rem; font-weight: 900; line-height: 1;">
+                    Memuat...</h2>
+            </div>
+        </div>
+
+        <div class="dashboard grid-dashboard" style="margin-bottom: 80px;">
+            <div class="main-chart-area glass-panel">
+                <div class="chart-header">
+                    <div>
+                        <h3 id="currentStockName" style="font-weight: 500;">Memuat...</h3>
+                        <div class="price-display">
+                            <span id="currentPrice" class="main-price">Rp 0</span>
+                            <span id="priceChange" class="change-badge bullish">0%</span>
+                        </div>
+                    </div>
+                    <div class="time-filters">
+                        <button id="btn-1d" class="filter-btn active" onclick="changeTimeRange('1d', '15m', 'btn-1d')">1
+                            Hari</button>
+                        <button id="btn-1mo" class="filter-btn" onclick="changeTimeRange('1mo', '1d', 'btn-1mo')">1
+                            Bulan</button>
+                        <button id="btn-1y" class="filter-btn" onclick="changeTimeRange('1y', '1wk', 'btn-1y')">1
+                            Tahun</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <div class="market-list glass-panel">
+                <h3>Daftar Emiten (Live)</h3>
+                <div class="stock-list" id="stockList">
+                </div>
+            </div>
+        </div>
+
+        <div style="display: none;">
+            <h3 id="heroStockCode"></h3>
+            <span id="heroStockName"></span>
+            <div id="heroPrice"></div>
+            <canvas id="miniChart"></canvas>
+        </div>
+    </section>
+
+    <div id="pricingModal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <button class="close-modal" onclick="closePricingModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center" style="margin-bottom: 40px;">
+                <h2 class="section-title">Akses Semua <span class="text-gradient">Fitur Premium</span></h2>
+                <p class="section-subtitle">Tingkatkan kemampuan analisis Anda dan jadilah investor mandiri.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card glass-panel">
+                    <h3>1 Bulan</h3>
+                    <div class="price">Rp 99k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-xmark text-muted"></i> Grup Komunitas VIP</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+                <div class="pricing-card glass-panel popular">
+                    <div class="popular-badge">Terpopuler</div>
+                    <h3>6 Bulan</h3>
+                    <div class="price">Rp 79k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Grup Komunitas VIP</li>
+                    </ul>
+                    <button class="btn btn-primary btn-glow" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+                <div class="pricing-card glass-panel">
+                    <h3>12 Bulan</h3>
+                    <div class="price">Rp 59k<span>/bln</span></div>
+                    <ul class="features">
+                        <li><i class="fa-solid fa-check text-bullish"></i> Akses Semua Materi</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Simulasi Real-time</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Grup Komunitas VIP</li>
+                        <li><i class="fa-solid fa-check text-bullish"></i> Mentoring 1-on-1</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 24px;">Pilih Paket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer glass-panel">
+        <div class="container text-center">
+            <p>&copy; 2026 SahamPedia. Dibuat untuk tujuan edukasi investasi.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
