@@ -13,7 +13,13 @@ const fallbackMarketData = [
     { code: 'TLKM', name: 'Telkom Indonesia', price: 3850, change: 0.8, history: generateRandomData(3700, 3900) },
     { code: 'ASII', name: 'Astra International', price: 5200, change: 2.1, history: generateRandomData(5000, 5300) },
     { code: 'ANTM', name: 'Aneka Tambang Tbk', price: 1650, change: -1.5, history: generateRandomData(1600, 1750) },
-    { code: 'BRIS', name: 'Bank Syariah Indonesia', price: 2100, change: 3.4, history: generateRandomData(2000, 2200) }
+    { code: 'BRIS', name: 'Bank Syariah Indonesia', price: 2100, change: 3.4, history: generateRandomData(2000, 2200) },
+    { code: 'BMRI', name: 'Bank Mandiri (Persero) Tbk', price: 7100, change: 1.5, history: generateRandomData(7000, 7200) },
+    { code: 'BBNI', name: 'Bank Negara Indonesia Tbk', price: 5350, change: 0.5, history: generateRandomData(5200, 5400) },
+    { code: 'UNVR', name: 'Unilever Indonesia Tbk', price: 2800, change: -1.2, history: generateRandomData(2700, 2900) },
+    { code: 'ICBP', name: 'Indofood CBP Sukses Makmur', price: 11200, change: 0.8, history: generateRandomData(11000, 11400) },
+    { code: 'PTBA', name: 'Bukit Asam Tbk', price: 2950, change: 2.5, history: generateRandomData(2850, 3050) },
+    { code: 'AMRT', name: 'Sumber Alfaria Trijaya Tbk', price: 2850, change: 1.1, history: generateRandomData(2800, 2900) }
 ];
 
 let marketData = [];
@@ -44,7 +50,13 @@ async function fetchRealMarketData() {
         { code: 'TLKM', ticker: 'TLKM.JK', name: 'Telkom Indonesia' },
         { code: 'ASII', ticker: 'ASII.JK', name: 'Astra International' },
         { code: 'ANTM', ticker: 'ANTM.JK', name: 'Aneka Tambang Tbk' },
-        { code: 'BRIS', ticker: 'BRIS.JK', name: 'Bank Syariah Indonesia' }
+        { code: 'BRIS', ticker: 'BRIS.JK', name: 'Bank Syariah Indonesia' },
+        { code: 'BMRI', ticker: 'BMRI.JK', name: 'Bank Mandiri (Persero) Tbk' },
+        { code: 'BBNI', ticker: 'BBNI.JK', name: 'Bank Negara Indonesia Tbk' },
+        { code: 'UNVR', ticker: 'UNVR.JK', name: 'Unilever Indonesia Tbk' },
+        { code: 'ICBP', ticker: 'ICBP.JK', name: 'Indofood CBP Sukses Makmur' },
+        { code: 'PTBA', ticker: 'PTBA.JK', name: 'Bukit Asam Tbk' },
+        { code: 'AMRT', ticker: 'AMRT.JK', name: 'Sumber Alfaria Trijaya Tbk' }
     ];
 
     try {
@@ -285,15 +297,32 @@ function updateDashboardUI() {
 
 function renderStockList() {
     const listContainer = document.getElementById('stockList');
+    if (!listContainer) return;
     listContainer.innerHTML = '';
 
-    marketData.forEach(stock => {
+    // Ambil kata kunci dari kolom pencarian
+    const searchInput = document.getElementById('searchInput');
+    const query = searchInput ? searchInput.value.toLowerCase() : '';
+
+    // Saring data berdasarkan kata kunci pencarian (Kode atau Nama Saham)
+    const filteredData = marketData.filter(stock =>
+        stock.code.toLowerCase().includes(query) ||
+        stock.name.toLowerCase().includes(query)
+    );
+
+    // Tampilkan pesan jika tidak ada saham yang cocok
+    if (filteredData.length === 0) {
+        listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;">Emiten tidak ditemukan.</p>';
+        return;
+    }
+
+    filteredData.forEach(stock => {
         const isBullish = stock.change >= 0;
         const colorClass = isBullish ? 'text-bullish' : 'text-bearish';
         const sign = isBullish ? '+' : '';
 
         const item = document.createElement('div');
-        item.className = `stock-item ${stock.code === activeStock.code ? 'active' : ''}`;
+        item.className = `stock-item ${activeStock && stock.code === activeStock.code ? 'active' : ''}`;
 
         let shortName = stock.name.split(' ')[0];
         if (stock.name.split(' ').length > 1) {
@@ -313,12 +342,12 @@ function renderStockList() {
 
         item.onclick = async () => {
             activeStock = stock;
-            renderStockList(); // Respons UI klik cepat
+            renderStockList(); // Respons UI klik cepat, mempertahankan status pencarian
             updateDashboardUI();
-            // Data sudah dimuat penuh di awal, jadi langsung bisa buat chart! Tidak perlu loading per sub-klik lagi.
             initMiniChart();
             initMainChart();
         };
+
 
         listContainer.appendChild(item);
     });
