@@ -460,6 +460,7 @@ async function fetchSingleStockData(code, name) {
         updateDashboardUI();
         initMiniChart();
         initMainChart();
+        fetchStockNews(name || code);
         
     } catch (e) {
         console.warn("Gagal menarik data simulasi:", e);
@@ -468,6 +469,41 @@ async function fetchSingleStockData(code, name) {
             listContainer.innerHTML = '<p style="text-align:center; color:var(--bearish); padding: 20px 0;">Gagal menarik data saham ini.</p>';
             setTimeout(() => renderStockList(), 2000);
         }
+    }
+}
+
+async function fetchStockNews(query) {
+    const listContainer = document.getElementById('newsList');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat berita terbaru...</p>';
+    
+    try {
+        const res = await fetch(`/api/search?q=${query}&quotesCount=0&newsCount=5`);
+        if (!res.ok) throw new Error("Gagal mengambil berita");
+        
+        const data = await res.json();
+        
+        if (!data.news || data.news.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;">Tidak ada berita terkini.</p>';
+            return;
+        }
+
+        let html = '';
+        data.news.forEach(n => {
+            const date = new Date(n.providerPublishTime * 1000).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+            html += `
+                <a href="${n.link}" target="_blank" style="display: block; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 0;">
+                    <div style="font-size: 0.75rem; color: var(--bullish); margin-bottom: 4px;">${n.publisher} &bull; ${date}</div>
+                    <h4 style="margin:0 0 6px 0; font-size: 0.95rem; color: var(--text-light); line-height: 1.4;">${n.title}</h4>
+                </a>
+            `;
+        });
+        
+        listContainer.innerHTML = html;
+        
+    } catch (e) {
+        listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;">Gagal memuat berita.</p>';
     }
 }
 
@@ -604,9 +640,194 @@ function closePricingModal() {
 
 // Tutup modal jika user klik area gelap di luar kotak harga
 window.addEventListener('click', function (event) {
-    const modal = document.getElementById('pricingModal');
-    if (event.target === modal) {
-        closePricingModal();
-    }
+    const pModal = document.getElementById('pricingModal');
+    if (event.target === pModal) closePricingModal();
+
+    const tModal = document.getElementById('tradeModal');
+    if (event.target === tModal) closeTradeModal();
 });
+
+// === FUNGSI PAPER TRADING (PORTOFOLIO) ===
+let portfolio = {
+    cash: 100000000,
+    holdings: {}
+};
+
+function initPortfolio() {
+    const saved = localStorage.getItem('sahampedia_portfolio');
+    if (saved) {
+        portfolio = JSON.parse(saved);
+    } else {
+        localStorage.setItem('sahampedia_portfolio', JSON.stringify(portfolio));
+    }
+    renderPortfolio();
+}
+
+function savePortfolio() {
+    localStorage.setItem('sahampedia_portfolio', JSON.stringify(portfolio));
+    renderPortfolio();
+}
+
+function renderPortfolio() {
+    const elCash = document.getElementById('portfolioCash');
+    const elTotal = document.getElementById('portfolioTotalValue');
+    const elList = document.getElementById('portfolioItemList');
+    
+    if(!elCash || !elTotal || !elList) return; // Hanya jalankan jika elemen ada di DOM (pasar.html)
+
+    elCash.innerText = `Rp ${portfolio.cash.toLocaleString('id-ID')}`;
+
+    let totalAsset = portfolio.cash;
+    let hasHoldings = false;
+    let listHTML = '';
+
+    for (let code in portfolio.holdings) {
+        const qtyLots = portfolio.holdings[code].lots;
+        const avgPrice = portfolio.holdings[code].avgPrice;
+        if (qtyLots <= 0) continue;
+
+        hasHoldings = true;
+
+        // Cari harga pasar terkini jika ada, kalau belum ada set ke harga avg sementara
+        const stockData = marketData.find(s => s.code === code);
+        const currentPrice = stockData ? stockData.price : avgPrice;
+        
+        const currentValue = qtyLots * 100 * currentPrice;
+        const buyValue = qtyLots * 100 * avgPrice;
+        const floating = currentValue - buyValue;
+        const floatingPercent = (floating / buyValue) * 100;
+
+        totalAsset += currentValue;
+
+        const colorClass = floating >= 0 ? 'text-bullish' : 'text-bearish';
+        const sign = floating >= 0 ? '+' : '';
+
+        listHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 0;">
+                <div>
+                    <h4 style="margin:0; font-size: 1.1rem">${code}</h4>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">${qtyLots} Lot @ Rp ${avgPrice.toLocaleString()}</span>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">Rp ${currentValue.toLocaleString('id-ID')}</div>
+                    <div class="${colorClass}" style="font-size: 0.85rem">${sign}${floating.toLocaleString('id-ID')} (${floatingPercent.toFixed(2)}%)</div>
+                </div>
+            </div>
+        `;
+    }
+
+    elTotal.innerText = `Rp ${totalAsset.toLocaleString('id-ID')}`;
+    
+    if (hasHoldings) {
+        elList.innerHTML = listHTML;
+    } else {
+        elList.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem; margin-top:20px;">Belum ada saham yang dibeli. Yuk praktik!</p>`;
+    }
+}
+
+// === FUNGSI MODAL TRANSAKSI ===
+let currentTradeMode = 'buy'; // 'buy' or 'sell'
+
+function openTradeModal(mode) {
+    if (!activeStock) return;
+    currentTradeMode = mode;
+
+    const modal = document.getElementById('tradeModal');
+    const title = document.getElementById('tradeModalTitle');
+    const btn = document.getElementById('btnExecuteTrade');
+    
+    title.innerHTML = `${mode === 'buy' ? 'Beli' : 'Jual'} <span class="text-gradient">${activeStock.code}</span>`;
+    btn.innerHTML = `Konfirmasi ${mode === 'buy' ? 'Beli' : 'Jual'}`;
+    btn.className = mode === 'buy' ? 'btn' : 'btn';
+    btn.style.backgroundColor = mode === 'buy' ? 'var(--bullish)' : 'var(--bearish)';
+    btn.style.color = 'white';
+
+    document.getElementById('tradeCurrentPrice').innerText = `Rp ${activeStock.price.toLocaleString('id-ID')} / lembar`;
+    document.getElementById('tradeAvailableCash').innerText = `Rp ${portfolio.cash.toLocaleString('id-ID')}`;
+    document.getElementById('tradeLotInput').value = 1;
+
+    calculateTradeTotal();
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTradeModal() {
+    document.getElementById('tradeModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+function calculateTradeTotal() {
+    const lotStr = document.getElementById('tradeLotInput').value;
+    const lots = parseInt(lotStr) || 0;
+    const totalValue = lots * 100 * (activeStock ? activeStock.price : 0);
+    
+    document.getElementById('tradeTotalValue').innerText = `Rp ${totalValue.toLocaleString('id-ID')}`;
+    
+    const btn = document.getElementById('btnExecuteTrade');
+    if (currentTradeMode === 'buy') {
+        if (totalValue > portfolio.cash) {
+            document.getElementById('tradeTotalValue').style.color = 'var(--bearish)';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        } else {
+            document.getElementById('tradeTotalValue').style.color = 'var(--bullish)';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    } else {
+        const h = portfolio.holdings[activeStock.code];
+        const maxLots = h ? h.lots : 0;
+        if (lots > maxLots || lots <= 0) {
+            document.getElementById('tradeTotalValue').style.color = 'var(--bearish)';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        } else {
+            document.getElementById('tradeTotalValue').style.color = 'var(--text-muted)';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }
+    }
+}
+
+document.getElementById('btnExecuteTrade')?.addEventListener('click', () => {
+    const lots = parseInt(document.getElementById('tradeLotInput').value) || 0;
+    if (lots <= 0) return;
+
+    const totalValue = lots * 100 * activeStock.price;
+
+    if (currentTradeMode === 'buy') {
+        if (totalValue > portfolio.cash) return; // double check
+        
+        portfolio.cash -= totalValue;
+        
+        if (!portfolio.holdings[activeStock.code]) {
+            portfolio.holdings[activeStock.code] = { lots: 0, avgPrice: 0 };
+        }
+        
+        const h = portfolio.holdings[activeStock.code];
+        const totalModalsSoFar = (h.lots * 100) * h.avgPrice;
+        const newTotalModals = totalModalsSoFar + totalValue;
+        
+        h.lots += lots;
+        h.avgPrice = newTotalModals / (h.lots * 100);
+        
+    } else {
+        const h = portfolio.holdings[activeStock.code];
+        if (!h || lots > h.lots) return; // double check
+        
+        portfolio.cash += totalValue;
+        h.lots -= lots;
+        
+        if (h.lots === 0) {
+            delete portfolio.holdings[activeStock.code];
+        }
+    }
+
+    savePortfolio();
+    closeTradeModal();
+});
+
+// Panggil inisialisasi di awal
+initPortfolio();
 

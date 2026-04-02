@@ -49,11 +49,17 @@
         <div class="dashboard grid-dashboard" style="margin-bottom: 80px;">
             <div class="main-chart-area glass-panel">
                 <div class="chart-header">
-                    <div>
-                        <h3 id="currentStockName" style="font-weight: 500;">Memuat...</h3>
-                        <div class="price-display">
-                            <span id="currentPrice" class="main-price">Rp 0</span>
-                            <span id="priceChange" class="change-badge bullish">0%</span>
+                    <div style="display: flex; align-items: flex-end; gap: 24px;">
+                        <div>
+                            <h3 id="currentStockName" style="font-weight: 500;">Memuat...</h3>
+                            <div class="price-display">
+                                <span id="currentPrice" class="main-price">Rp 0</span>
+                                <span id="priceChange" class="change-badge bullish">0%</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 6px; display: flex; gap: 8px;">
+                            <button class="btn" style="background:var(--bullish); color:white; padding: 6px 16px;" onclick="openTradeModal('buy')">Beli</button>
+                            <button class="btn" style="background:var(--bearish); color:white; padding: 6px 16px;" onclick="openTradeModal('sell')">Jual</button>
                         </div>
                     </div>
                     <div class="time-filters">
@@ -79,6 +85,40 @@
                         oninput="renderStockList()">
                 </div>
                 <div class="stock-list" id="stockList" style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW SECTIONS: PORTFOLIO & NEWS -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 80px;">
+            <!-- PORTFOLIO PANEL -->
+            <div class="glass-panel" style="padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px; margin-bottom: 16px;">
+                    <h3 style="font-size: 1.2rem;"><i class="fa-solid fa-wallet text-warning"></i> Portofolio Saya</h3>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Total Aset (Akun Demo)</div>
+                        <div id="portfolioTotalValue" style="font-size: 1.4rem; font-weight: 700;" class="text-gradient">Rp 100.000.000</div>
+                    </div>
+                </div>
+                <!-- SISA UANG TUNAI -->
+                <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                    <span style="color: var(--text-muted);">Daya Beli (Cash)</span>
+                    <span id="portfolioCash" style="font-weight: 600;">Rp 100.000.000</span>
+                </div>
+                <div id="portfolioItemList" style="max-height: 250px; overflow-y: auto; padding-right: 8px;">
+                    <!-- Diisi lewat JS -->
+                    <p style="text-align:center; color:var(--text-muted); font-size: 0.9rem; margin-top:20px;">Belum ada saham yang dibeli. Yuk praktik!</p>
+                </div>
+            </div>
+
+            <!-- NEWS PANEL -->
+            <div class="glass-panel" style="padding: 24px;">
+                <h3 style="font-size: 1.2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px; margin-bottom: 16px;">
+                    <i class="fa-solid fa-newspaper text-bullish"></i> Berita Terkini
+                </h3>
+                <div id="newsList" style="max-height: 320px; overflow-y: auto; padding-right: 8px;">
+                    <!-- Diisi lewat JS -->
+                    <p style="text-align:center; color:var(--text-muted); font-size: 0.9rem; margin-top:20px;">Memuat berita pasar...</p>
                 </div>
             </div>
         </div>
@@ -142,7 +182,39 @@
         </div>
     </footer>
 
+    <div id="tradeModal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="max-width: 400px;">
+            <button class="close-modal" onclick="closeTradeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center" style="margin-bottom: 24px;">
+                <h2 class="section-title" id="tradeModalTitle" style="font-size:1.8rem">Beli <span class="text-gradient">BBCA</span></h2>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--text-muted);">Harga Saat Ini</span>
+                    <span id="tradeCurrentPrice" style="font-weight: 600;">Rp 0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Daya Beli (Cash)</span>
+                    <span id="tradeAvailableCash" style="font-weight: 600;">Rp 0</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text-muted);">Jumlah Lot (1 Lot = 100 Lembar)</label>
+                <input type="number" id="tradeLotInput" class="search-input" min="1" value="1" style="width: 100%; border-radius: 8px;" oninput="calculateTradeTotal()">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 1.1rem; border-top: 1px solid var(--glass-border); padding-top: 16px;">
+                <span style="font-weight: 600;">Total Nilai</span>
+                <span id="tradeTotalValue" style="font-weight: 700; color: var(--bullish);">Rp 0</span>
+            </div>
+
+            <button id="btnExecuteTrade" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 8px;">Konfirmasi Beli</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 
-</html>
+</html>npm i -g vercel
