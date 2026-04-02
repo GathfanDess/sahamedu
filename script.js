@@ -19,7 +19,15 @@ const fallbackMarketData = [
     { code: 'UNVR', name: 'Unilever Indonesia Tbk', price: 2800, change: -1.2, history: generateRandomData(2700, 2900) },
     { code: 'ICBP', name: 'Indofood CBP Sukses Makmur', price: 11200, change: 0.8, history: generateRandomData(11000, 11400) },
     { code: 'PTBA', name: 'Bukit Asam Tbk', price: 2950, change: 2.5, history: generateRandomData(2850, 3050) },
-    { code: 'AMRT', name: 'Sumber Alfaria Trijaya Tbk', price: 2850, change: 1.1, history: generateRandomData(2800, 2900) }
+    { code: 'AMRT', name: 'Sumber Alfaria Trijaya Tbk', price: 2850, change: 1.1, history: generateRandomData(2800, 2900) },
+    { code: 'ADRO', name: 'Adaro Energy Indonesia Tbk', price: 2700, change: 1.5, history: generateRandomData(2600, 2800) },
+    { code: 'PGAS', name: 'Perusahaan Gas Negara Tbk', price: 1550, change: -0.8, history: generateRandomData(1500, 1600) },
+    { code: 'KLBF', name: 'Kalbe Farma Tbk', price: 1450, change: 0.5, history: generateRandomData(1400, 1500) },
+    { code: 'MDKA', name: 'Merdeka Copper Gold Tbk', price: 2350, change: -1.2, history: generateRandomData(2300, 2450) },
+    { code: 'INDF', name: 'Indofood Sukses Makmur Tbk', price: 6300, change: 0.4, history: generateRandomData(6200, 6400) },
+    { code: 'BBTN', name: 'Bank Tabungan Negara Tbk', price: 1400, change: 1.8, history: generateRandomData(1350, 1450) },
+    { code: 'SMGR', name: 'Semen Indonesia Tbk', price: 6000, change: -0.5, history: generateRandomData(5900, 6100) },
+    { code: 'ITMG', name: 'Indo Tambangraya Megah Tbk', price: 26500, change: 2.1, history: generateRandomData(26000, 27000) }
 ];
 
 let marketData = [];
@@ -56,7 +64,15 @@ async function fetchRealMarketData() {
         { code: 'UNVR', ticker: 'UNVR.JK', name: 'Unilever Indonesia Tbk' },
         { code: 'ICBP', ticker: 'ICBP.JK', name: 'Indofood CBP Sukses Makmur' },
         { code: 'PTBA', ticker: 'PTBA.JK', name: 'Bukit Asam Tbk' },
-        { code: 'AMRT', ticker: 'AMRT.JK', name: 'Sumber Alfaria Trijaya Tbk' }
+        { code: 'AMRT', ticker: 'AMRT.JK', name: 'Sumber Alfaria Trijaya Tbk' },
+        { code: 'ADRO', ticker: 'ADRO.JK', name: 'Adaro Energy Indonesia Tbk' },
+        { code: 'PGAS', ticker: 'PGAS.JK', name: 'Perusahaan Gas Negara Tbk' },
+        { code: 'KLBF', ticker: 'KLBF.JK', name: 'Kalbe Farma Tbk' },
+        { code: 'MDKA', ticker: 'MDKA.JK', name: 'Merdeka Copper Gold Tbk' },
+        { code: 'INDF', ticker: 'INDF.JK', name: 'Indofood Sukses Makmur Tbk' },
+        { code: 'BBTN', ticker: 'BBTN.JK', name: 'Bank Tabungan Negara Tbk' },
+        { code: 'SMGR', ticker: 'SMGR.JK', name: 'Semen Indonesia Tbk' },
+        { code: 'ITMG', ticker: 'ITMG.JK', name: 'Indo Tambangraya Megah Tbk' }
     ];
 
     try {
@@ -295,28 +311,77 @@ function updateDashboardUI() {
     }
 }
 
+let searchTimeout = null;
+
 function renderStockList() {
     const listContainer = document.getElementById('stockList');
     if (!listContainer) return;
-    listContainer.innerHTML = '';
-
-    // Ambil kata kunci dari kolom pencarian
+    
     const searchInput = document.getElementById('searchInput');
-    const query = searchInput ? searchInput.value.toLowerCase() : '';
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    // Saring data berdasarkan kata kunci pencarian (Kode atau Nama Saham)
-    const filteredData = marketData.filter(stock =>
-        stock.code.toLowerCase().includes(query) ||
-        stock.name.toLowerCase().includes(query)
-    );
+    if (query === '') {
+        displayStocksLocal(marketData, listContainer);
+        return;
+    }
 
-    // Tampilkan pesan jika tidak ada saham yang cocok
-    if (filteredData.length === 0) {
+    listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;"><i class="fa-solid fa-circle-notch fa-spin"></i> Mencari...</p>';
+
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+        try {
+            const res = await fetch(`/api/search?q=${query}&quotesCount=10&newsCount=0`);
+            if (!res.ok) throw new Error("Search API Failed");
+            const data = await res.json();
+            
+            const idxResults = data.quotes.filter(q => q.quoteType === 'EQUITY' && (q.exchange === 'JKT' || (q.symbol && q.symbol.endsWith('.JK'))));
+
+            if (idxResults.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;">Emiten tidak ditemukan.</p>';
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            
+            idxResults.forEach(quote => {
+                const pureCode = quote.symbol.replace('.JK', '');
+                const item = document.createElement('div');
+                item.className = `stock-item ${activeStock && activeStock.code === pureCode ? 'active' : ''}`;
+
+                let shortName = quote.shortname || pureCode;
+                item.innerHTML = `
+                    <div class="s-info">
+                        <h4>${pureCode}</h4>
+                        <span style="font-size:0.75rem">${shortName.length > 20 ? shortName.substring(0, 20) + '...' : shortName}</span>
+                    </div>
+                    <div class="s-price">
+                        <span style="font-size: 0.8rem; color: var(--text-muted)"><i class="fa-solid fa-download"></i> Tarik Data</span>
+                    </div>
+                `;
+
+                item.onclick = async () => {
+                   item.innerHTML = `<div style="text-align:center; width:100%; color:var(--text-muted)"><i class="fa-solid fa-spinner fa-spin"></i> Menarik Data...</div>`;
+                   await fetchSingleStockData(pureCode, shortName);
+                };
+
+                listContainer.appendChild(item);
+            });
+
+        } catch (error) {
+            console.error("Search API Error:", error);
+            listContainer.innerHTML = '<p style="text-align:center; color:var(--bearish); padding: 20px 0;">Gagal mencari emiten.</p>';
+        }
+    }, 500);
+}
+
+function displayStocksLocal(dataArray, listContainer) {
+    listContainer.innerHTML = '';
+    if (dataArray.length === 0) {
         listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px 0;">Emiten tidak ditemukan.</p>';
         return;
     }
 
-    filteredData.forEach(stock => {
+    dataArray.forEach(stock => {
         const isBullish = stock.change >= 0;
         const colorClass = isBullish ? 'text-bullish' : 'text-bearish';
         const sign = isBullish ? '+' : '';
@@ -342,15 +407,68 @@ function renderStockList() {
 
         item.onclick = async () => {
             activeStock = stock;
-            renderStockList(); // Respons UI klik cepat, mempertahankan status pencarian
+            displayStocksLocal(dataArray, listContainer); 
             updateDashboardUI();
             initMiniChart();
             initMainChart();
         };
 
-
         listContainer.appendChild(item);
     });
+}
+
+async function fetchSingleStockData(code, name) {
+    try {
+        const ticker = `${code}.JK`;
+        const response = await fetch(`/api/yf/${ticker}?range=${globalRange}&interval=${globalInterval}`);
+        if (!response.ok) throw new Error("YF API Blocked");
+
+        const data = await response.json();
+        if (!data.chart.result || data.chart.result.length === 0) throw new Error("No data");
+        const result = data.chart.result[0];
+
+        const currentPrice = result.meta.regularMarketPrice;
+        const prevClose = result.meta.chartPreviousClose;
+        let change = 0;
+        if (prevClose) change = (((currentPrice - prevClose) / prevClose) * 100).toFixed(2);
+
+        const history = result.indicators.quote[0].close
+            .filter(price => price !== null)
+            .map(price => parseFloat(price));
+
+        const stockObj = {
+            code: code,
+            name: name,
+            price: parseInt(currentPrice),
+            change: parseFloat(change),
+            history: history
+        };
+
+        const existingIndex = marketData.findIndex(s => s.code === code);
+        if (existingIndex !== -1) {
+            marketData[existingIndex] = stockObj;
+        } else {
+            marketData.unshift(stockObj);
+        }
+
+        activeStock = stockObj;
+        
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
+        renderStockList();
+        
+        updateDashboardUI();
+        initMiniChart();
+        initMainChart();
+        
+    } catch (e) {
+        console.warn("Gagal menarik data simulasi:", e);
+        const listContainer = document.getElementById('stockList');
+        if (listContainer) {
+            listContainer.innerHTML = '<p style="text-align:center; color:var(--bearish); padding: 20px 0;">Gagal menarik data saham ini.</p>';
+            setTimeout(() => renderStockList(), 2000);
+        }
+    }
 }
 
 window.addEventListener('scroll', () => {
